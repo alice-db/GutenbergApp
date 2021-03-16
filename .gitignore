@@ -1,0 +1,8 @@
+# mytig example
+mytig/
+
+# pycache
+__pycache__
+
+# MacOS
+.DS_Store
