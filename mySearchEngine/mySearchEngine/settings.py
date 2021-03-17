@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -120,3 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+BASE_CATALOG_DIR = os.path.join(BASE_DIR, 'mygutenberg/catalog_files')
+CATALOG_RDF_DIR = os.path.join(BASE_CATALOG_DIR, 'rdf')
+CATALOG_INDEX_DIR = os.path.join(CATALOG_RDF_DIR, 'index.json')
+CATALOG_LOG_DIR = os.path.join(BASE_CATALOG_DIR, 'log')
+CATALOG_TEMP_DIR = os.path.join(BASE_CATALOG_DIR, 'tmp')
