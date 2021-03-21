@@ -1,0 +1,12 @@
+{
+  "name": "myGutenbergApp",
+  "displayName": "myGutenbergApp",
+  "expo": {
+    "name": "myGutenbergApp",
+    "slug": "myGutenbergApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
