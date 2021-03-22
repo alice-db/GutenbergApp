@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="Moteur-Recherche-Mylene-Balech">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="13"/>
+    <property name="source" value="13"/>
+    <path id="Moteur-Recherche-Mylene-Balech.classpath">
+        <pathelement location="out/production/Moteur-Recherche-Mylene-Balech"/>
+    </path>
+    <path id="run.Regex.classpath">
+        <path refid="Moteur-Recherche-Mylene-Balech.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="out/production/Moteur-Recherche-Mylene-Balech"/>
+        <copy includeemptydirs="false" todir="out/production/Moteur-Recherche-Mylene-Balech">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="out/production/Moteur-Recherche-Mylene-Balech"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="out/production/Moteur-Recherche-Mylene-Balech" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="Moteur-Recherche-Mylene-Balech.classpath"/>
+        </javac>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="Regex">
+        <java classname="regex.Regex" failonerror="true" fork="yes">
+            <classpath refid="run.Regex.classpath"/>
+        	<arg value="S(a|r|g)*on|A(s|y)*rian"/>
+        	<arg value="sargon.txt"/>
+        </java>
+    </target>
+</project>
