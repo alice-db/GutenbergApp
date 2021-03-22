@@ -1,23 +1,11 @@
 from django.db import models
 
-# Create your models here.
-class LivresEnAnglais(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    livreID = models.IntegerField(default='-1')
+class BooksUrl(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	bookID = models.IntegerField(default='-1')
+	url = models.CharField(max_length = 1000, unique=True)
 
-    class Meta:
-        ordering = ('livreID',)
-
-class LivresEnFrancais(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    livreID = models.IntegerField(default='-1')
-
-    class Meta:
-        ordering = ('livreID',)
-
-class Livres(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    livreID = models.IntegerField(default='-1')
-
-    class Meta:
-        ordering = ('livreID',)
+class TermesUrl(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	terme = models.CharField(max_length = 1000, unique=True)
+	urls = models.CharField(max_length = 1000, unique=True)

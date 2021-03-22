@@ -3,6 +3,7 @@ from subprocess import call
 import json
 import os
 import shutil
+import time
 from time import strftime
 import sys
 import urllib.request
@@ -11,8 +12,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from mygutenberg import util
 
-from mygutenberg.models import Livres
-from mygutenberg.serializers import LivresSerializer
+from mygutenberg.models import BooksUrl
+from mygutenberg.serializers import BooksUrlSerializer
 #from books.models import *
 
 
@@ -48,7 +49,7 @@ def log(*args):
         log_file.write(text)
 
 
-def put_catalog_in_db():
+def put_catalog_in_db(self):
     book_ids = []
     for directory_item in os.listdir(settings.CATALOG_RDF_DIR):
         item_path = os.path.join(settings.CATALOG_RDF_DIR, directory_item)
@@ -62,9 +63,10 @@ def put_catalog_in_db():
                 book_ids.append(book_id)
     book_ids.sort()
     book_directories = [str(id) for id in book_ids]
-    books = []
     cpt = 0
     for directory in book_directories:
+        if cpt == 5000:
+            break
         id = int(directory)
 
         if (id > 0) and (id % 500 == 0):
@@ -77,12 +79,30 @@ def put_catalog_in_db():
         )
 
         book = util.get_book(id, book_path)
-        books.append(book)
-        if cpt == 1664:
-            break
-        cpt+=1
-    with open(settings.BASE_CATALOG_DIR+"/catalog.json", "w") as write_file:
-        json.dump(books, write_file)
+        
+        count_word = 0
+        url = ""
+        for x in book['url']:
+            try:
+                URL = x
+                DOWNLOAD_PATH = os.path.join(TEMP_PATH, 'text'+str(id)+".txt")
+                urllib.request.urlretrieve(URL, DOWNLOAD_PATH)
+                with open(DOWNLOAD_PATH) as f:
+                    lines = f.readlines()
+                count_word_a = 0
+                for i in range (len(lines)):
+                    count_word_a += len(lines[i].split())
+                if count_word < count_word_a:
+                    url = x
+                    count_word = count_word_a
+            except:
+                print('ERROR')
+        if(count_word > 10000):
+            serializer = BooksUrlSerializer(data={'bookID': str(book['id']), 'url': url})
+            if serializer.is_valid():
+                serializer.save()
+                self.stdout.write(self.style.SUCCESS('[' + time.ctime() + '] Successfully added book id="%s"' % book['id']))
+            cpt += 1
 
 class Command(BaseCommand):
     help = 'This replaces the catalog files with the latest ones.'
@@ -146,7 +166,7 @@ class Command(BaseCommand):
                     )
 
             log('  Putting the catalog in the database...')
-            put_catalog_in_db()
+            put_catalog_in_db(self)
 
             log('  Removing temporary files...')
             shutil.rmtree(TEMP_PATH)
