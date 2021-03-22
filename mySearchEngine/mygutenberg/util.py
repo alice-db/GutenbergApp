@@ -1,6 +1,11 @@
 import xml.etree.ElementTree as parser
 import re
-
+import os
+import shutil
+from time import strftime
+import sys
+import urllib.request
+from django.conf import settings
 
 LINE_BREAK_PATTERN = re.compile(r'[ \t]*[\n\r]+[ \t]*')
 NAMESPACES = {
@@ -9,7 +14,15 @@ NAMESPACES = {
     'pg': 'http://www.gutenberg.org/2009/pgterms/',
     'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 }
+NS = dict(
+        pg='http://www.gutenberg.org/2009/pgterms/',
+        dc='http://purl.org/dc/terms/',
+        dcam='http://purl.org/dc/dcam/',
+        rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 
+TEMP_PATH = settings.CATALOG_TEMP_DIR
+
+DOWNLOAD_PATH = os.path.join(TEMP_PATH, '/files')
 
 def fix_subtitles(title):
     """
@@ -40,40 +53,25 @@ def get_book(id, xml_file_path):
     book = root.find('{%(pg)s}ebook' % NAMESPACES)
 
     result = {
-        'id': int(id),
-        'title': None,
-        'authors': [],
-        'languages': []
+        'id' : int(id),
+        'url': []
     }
 
-    # Authors
-    creators = book.findall('.//{%(dc)s}creator' % NAMESPACES)
-    for creator in creators:
-        author = {'birth': None, 'death': None}
-        name = creator.find('.//{%(pg)s}name' % NAMESPACES)
-        if name is None:
-            continue
-        author['name'] = safe_unicode(name.text, encoding='UTF-8')
-        birth = creator.find('.//{%(pg)s}birthdate' % NAMESPACES)
-        if birth is not None:
-            author['birth'] = int(birth.text)
-        death = creator.find('.//{%(pg)s}deathdate' % NAMESPACES)
-        if death is not None:
-            author['death'] = int(death.text)
-        result['authors'] += [author]
+    # formats
+    formats = {file.find('{%(dc)s}format//{%(rdf)s}value' % NS).text:
+            file.get('{%(rdf)s}about' % NS)
+            for file in book.findall('.//{%(pg)s}file' % NS)}
 
-    # Title
-    title = book.find('.//{%(dc)s}title' % NAMESPACES)
-    if title is not None:
-        result['title'] = fix_subtitles(
-            safe_unicode(title.text, encoding='UTF-8')
-        )
-
-    # Languages
-    languages = book.findall(
-        './/{%(dc)s}language//{%(rdf)s}value' % NAMESPACES
-    )
-    result['languages'] = [language.text for language in languages] or []
+    for x in formats:
+        if formats[x].find('txt') != -1:
+            try:
+                URL = formats[x]
+                DOWNLOAD_PATH = os.path.join(TEMP_PATH, 'text'+str(id)+".txt")
+                urllib.request.urlretrieve(URL, DOWNLOAD_PATH)
+                result['url'].append(URL)
+                break
+            except:
+                print("ERROR")
 
     return result
 
