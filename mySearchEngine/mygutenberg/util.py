@@ -14,11 +14,6 @@ NAMESPACES = {
     'pg': 'http://www.gutenberg.org/2009/pgterms/',
     'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 }
-NS = dict(
-        pg='http://www.gutenberg.org/2009/pgterms/',
-        dc='http://purl.org/dc/terms/',
-        dcam='http://purl.org/dc/dcam/',
-        rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 
 TEMP_PATH = settings.CATALOG_TEMP_DIR
 
@@ -54,25 +49,43 @@ def get_book(id, xml_file_path):
 
     result = {
         'id' : int(id),
+        'auteurs': None,
+        'cover': None,
         'url': []
     }
 
-    # formats
-    formats = {file.find('{%(dc)s}format//{%(rdf)s}value' % NS).text:
-            file.get('{%(rdf)s}about' % NS)
-            for file in book.findall('.//{%(pg)s}file' % NS)}
+    # Authors
+    creators = book.findall('.//{%(dc)s}creator' % NAMESPACES)
+    result['auteurs'] =""
+    for creator in creators:
+        if result['auteurs']!= "":
+            result['auteurs']+= ", "
+        name = creator.find('.//{%(pg)s}name' % NAMESPACES)
+        if name is None:
+            continue
+        author_name = safe_unicode(name.text, encoding='UTF-8')
+        result['auteurs'] += author_name
 
+    # formats
+    formats = book.findall('.//{%(dc)s}hasFormat' % NAMESPACES)
+    url = []
+    cover = ""
     for x in formats:
-        if formats[x].find('txt') != -1:
+        file = x.find('.//{%(pg)s}file' % NAMESPACES)
+        file = file.get('{%(rdf)s}about' % NAMESPACES)
+        if file.find('.small.') > -1:
+            cover = file
+        if file.find('.txt') > -1:
             try:
-                URL = formats[x]
+                URL = file
                 DOWNLOAD_PATH = os.path.join(TEMP_PATH, 'text'+str(id)+".txt")
                 urllib.request.urlretrieve(URL, DOWNLOAD_PATH)
-                result['url'].append(URL)
-                break
+                url.append(URL)
             except:
                 print("ERROR")
 
+    result['url'] = url
+    result['cover'] = cover
     return result
 
 
