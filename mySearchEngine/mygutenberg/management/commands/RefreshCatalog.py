@@ -64,8 +64,9 @@ def put_catalog_in_db(self):
     book_ids.sort()
     book_directories = [str(id) for id in book_ids]
     cpt = 0
+    #BooksUrl.objects.all().delete()
     for directory in book_directories:
-        if cpt == 5000:
+        if cpt == 10:
             break
         id = int(directory)
 
@@ -97,12 +98,14 @@ def put_catalog_in_db(self):
                     count_word = count_word_a
             except:
                 print('ERROR')
-        if(count_word > 10000):
-            serializer = BooksUrlSerializer(data={'bookID': str(book['id']), 'url': url})
-            if serializer.is_valid():
-                serializer.save()
-                self.stdout.write(self.style.SUCCESS('[' + time.ctime() + '] Successfully added book id="%s"' % book['id']))
-            cpt += 1
+
+        print(book)
+        #if(count_word > 10000):
+        #    serializer = BooksUrlSerializer(data={'bookID': book['id'], 'url': url, 'auteurs': str(book['auteurs']), 'cover': str(book['cover'])})
+        #    if serializer.is_valid():
+        #        serializer.save()
+        #        self.stdout.write(self.style.SUCCESS('[' + time.ctime() + '] Successfully added book id="%s"' % book['id']))
+        cpt += 1
 
 class Command(BaseCommand):
     help = 'This replaces the catalog files with the latest ones.'
@@ -113,63 +116,63 @@ class Command(BaseCommand):
             log('Starting script at', date_and_time)
 
             log('  Making temporary directory...')
-            if os.path.exists(TEMP_PATH):
-                raise CommandError(
-                    'The temporary path, `' + TEMP_PATH + '`, already exists.'
-                )
-            else:
-                os.makedirs(TEMP_PATH)
+           # if os.path.exists(TEMP_PATH):
+           #     raise CommandError(
+           #         'The temporary path, `' + TEMP_PATH + '`, already exists.'
+           #     )
+           # else:
+            #os.makedirs(TEMP_PATH)
 
-            log('  Downloading compressed catalog...')
-            urllib.request.urlretrieve(URL, DOWNLOAD_PATH)
-
-            log('  Decompressing catalog...')
-            if not os.path.exists(DOWNLOAD_PATH):
-                os.makedirs(DOWNLOAD_PATH)
-            with open(os.devnull, 'w') as null:
-                call(
-                    ['tar', 'fjvx', DOWNLOAD_PATH, '-C', TEMP_PATH],
-                    stdout=null,
-                    stderr=null
-                )
-
-            log('  Detecting stale directories...')
-            if not os.path.exists(MOVE_TARGET_PATH):
-                os.makedirs(MOVE_TARGET_PATH)
-            new_directory_set = get_directory_set(MOVE_SOURCE_PATH)
-            old_directory_set = get_directory_set(MOVE_TARGET_PATH)
-            stale_directory_set = old_directory_set - new_directory_set
-
-            log('  Removing stale directories and books...')
-            for directory in stale_directory_set:
-                try:
-                    book_id = int(directory)
-                except ValueError:
-                    # Ignore the directory if its name isn't a book ID number.
-                    continue
-                path = os.path.join(MOVE_TARGET_PATH, directory)
-                shutil.rmtree(path)
-
-            log('  Replacing old catalog...')
-            with open(os.devnull, 'w') as null:
-                with open(LOG_PATH, 'a') as log_file:
-                    call(
-                        [
-                            'rsync',
-                            '-va',
-                            '--delete-after',
-                            MOVE_SOURCE_PATH + '/',
-                            MOVE_TARGET_PATH
-                        ],
-                        stdout=null,
-                        stderr=log_file
-                    )
+            # log('  Downloading compressed catalog...')
+            # urllib.request.urlretrieve(URL, DOWNLOAD_PATH)
+            #
+            # log('  Decompressing catalog...')
+            # if not os.path.exists(DOWNLOAD_PATH):
+            #     os.makedirs(DOWNLOAD_PATH)
+            # with open(os.devnull, 'w') as null:
+            #     call(
+            #         ['tar', 'fjvx', DOWNLOAD_PATH, '-C', TEMP_PATH],
+            #         stdout=null,
+            #         stderr=null
+            #     )
+            #
+            # log('  Detecting stale directories...')
+            # if not os.path.exists(MOVE_TARGET_PATH):
+            #     os.makedirs(MOVE_TARGET_PATH)
+            # new_directory_set = get_directory_set(MOVE_SOURCE_PATH)
+            # old_directory_set = get_directory_set(MOVE_TARGET_PATH)
+            # stale_directory_set = old_directory_set - new_directory_set
+            #
+            # log('  Removing stale directories and books...')
+            # for directory in stale_directory_set:
+            #     try:
+            #         book_id = int(directory)
+            #     except ValueError:
+            #         # Ignore the directory if its name isn't a book ID number.
+            #         continue
+            #     path = os.path.join(MOVE_TARGET_PATH, directory)
+            #     shutil.rmtree(path)
+            #
+            # log('  Replacing old catalog...')
+            # with open(os.devnull, 'w') as null:
+            #     with open(LOG_PATH, 'a') as log_file:
+            #         call(
+            #             [
+            #                 'rsync',
+            #                 '-va',
+            #                 '--delete-after',
+            #                 MOVE_SOURCE_PATH + '/',
+            #                 MOVE_TARGET_PATH
+            #             ],
+            #             stdout=null,
+            #             stderr=log_file
+            #         )
 
             log('  Putting the catalog in the database...')
             put_catalog_in_db(self)
 
             log('  Removing temporary files...')
-            shutil.rmtree(TEMP_PATH)
+           # shutil.rmtree(TEMP_PATH)
 
             log('Done!\n')
         except Exception as error:
