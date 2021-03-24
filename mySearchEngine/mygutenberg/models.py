@@ -10,4 +10,4 @@ class BooksUrl(models.Model):
 class TermesUrl(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	terme = models.CharField(max_length = 1000, unique=True)
-	urls = models.CharField(max_length = 1000)
+	ids = models.CharField(max_length = 1000)

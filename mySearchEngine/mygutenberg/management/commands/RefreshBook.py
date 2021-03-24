@@ -1,12 +1,6 @@
-import requests
-from subprocess import call
-import json
 import os
 import shutil
-import time
 from time import strftime
-import sys
-import urllib.request
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -14,7 +8,6 @@ from mygutenberg import util
 
 from mygutenberg.models import BooksUrl
 from mygutenberg.serializers import BooksUrlSerializer
-#from books.models import *
 
 
 TEMP_PATH = settings.CATALOG_TEMP_DIR
