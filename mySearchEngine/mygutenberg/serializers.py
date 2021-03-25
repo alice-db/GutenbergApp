@@ -10,5 +10,4 @@ class BooksUrlSerializer(ModelSerializer):
 class TermesUrlSerializer(ModelSerializer):
 	class Meta:
 		model = TermesUrl
-		fields = ('id','terme', 'urls')
-
+		fields = ('id','terme','ids')
