@@ -7,6 +7,12 @@ __pycache__
 # venv python
 mySearchEngine/myTidyVEnv
 
+## mySearchEngine ##
+
+text*.txt
+log/
+mySearchEngine/db.sqlite3
+
 ## myGutenbergApp ##
 
 # Android/IntelliJ
