@@ -17,3 +17,8 @@ A search engine based on the Gutenberg library
 `python3 manage.py RefreshEnglish`
 ###### Refresh french books
 `python3 manage.py RefreshFrench`
+
+
+# JAR FILE
+Run with dbSqlite3
+
