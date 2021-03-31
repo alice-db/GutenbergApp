@@ -20,5 +20,5 @@ A search engine based on the Gutenberg library
 
 
 # JAR FILE
-Run with dbSqlite3
+Run with db.Sqlite3
 
