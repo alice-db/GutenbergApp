@@ -16,4 +16,4 @@ class Jaccard(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	x_bookID = models.IntegerField(default='-1')
 	y_bookID = models.IntegerField(default='-1')
-	dist = models.DecimalField(default='-1', max_digits=100, decimal_places=4)
+	dist = models.DecimalField(default='-1', max_digits=5, decimal_places=4)

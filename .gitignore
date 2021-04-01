@@ -12,6 +12,7 @@ mySearchEngine/myTidyVEnv
 text*.txt
 log/
 mySearchEngine/db.sqlite3
+mySearchEngine/db-test.sqlite3
 
 ## myGutenbergApp ##
 
