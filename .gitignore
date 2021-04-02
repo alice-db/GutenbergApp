@@ -12,8 +12,9 @@ mySearchEngine/myTidyVEnv
 text*.txt
 log/
 mySearchEngine/db.sqlite3
+mySearchEngine/db.sqlite3-journal
 mySearchEngine/db-test.sqlite3
-
+mySearchEngine/occurences.txt 
 ## myGutenbergApp ##
 
 # Android/IntelliJ
