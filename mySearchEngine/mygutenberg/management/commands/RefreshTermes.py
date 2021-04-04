@@ -7,16 +7,13 @@ from mygutenberg.models import BooksUrl
 from mygutenberg.serializers import BooksUrlSerializer
 from mygutenberg.models import TermesUrl
 from mygutenberg.serializers import TermesUrlSerializer
+import re
 
 TEMP_PATH = settings.CATALOG_TEMP_DIR
 
-blacklist_en = ["a","an","but", "or", "where","when","has", "and", "therefore", "or", "neither", "because", "to", "in", "by", "for","to","with","from","without","under","on","against","despite","at","among","that", "what", "which", "which", "he", "she", "they","them", "some", "such","so","I","us","you","it","yes","no","indeed","otherwise","many","the","this","there","of","here","over","all","more","are","may","be","both","old","were","one","two","is","our","his","her","out","most","into","either","if","its","do","don't","as","must","your","these","have","been","can","any","not","other","even","only","dont","just","end","each","within","without","with","we","per","way","new","than","ever","get","up","top","give","had","been"]
+blacklist_en = ["a","an","but", "or", "where","when","has", "and", "therefore", "or", "neither", "because", "to", "in", "by", "for","to","with","from","without","under","on","against","despite","at","among","that", "what", "which", "which", "he", "she", "they","them", "some", "such","so","I","us","you","it","yes","no","indeed","otherwise","many","the","this","there","of","here","over","all","more","are","may","be","both","old","were","one","two","is","our","his","her","out","most","into","either","if","its","do","don't","as","must","your","these","have","been","can","any","not","other","even","only","dont","just","end","each","within","without","with","we","per","way","new","than","ever","get","up","top","give","had","been","zip","tar","gz","dmg","exe","www","fr","en","com","http","https"]
 blacklist_fr = ["mais","ou","où","et","donc","or","ni","car","à","dans","par","pour","en","vers","avec","de","sans","sous","sur","contre","malgré","chez","parmi","que","quoi","quoi","quel","quelle","qu'il","qu'elle","qu'ils","qu'elles","quelque","quelques","tel","telle","tellement","je","tu","nous","vous","oui","non","cas","ici"]
-ponctuation = ["?",",","!","+",";","=","_",")","(","'","@","&",'"',"*","$",":","/","\n"," ","\r","#","[","]"]
-union = "-"
-point = "."
-
-blacklist = blacklist_en+blacklist_fr+ponctuation
+blacklist = blacklist_en+blacklist_fr
 
 numbers = ["1","2","3","4","5","6","7","8","9","0"]
 
@@ -27,22 +24,15 @@ def preg_macth(mot):
     return False
 
 def changeCharac(mot):
-    for p in ponctuation:
-        if mot.find(p) > -1:
-            mot = mot.replace(p,"")
-    if len(mot) > 1 and mot[len(mot)-1] == point:
-        mot = mot[:len(mot)-1]
+    mot = re.sub('[^A-Za-z0-9]+', ' ', mot)
     return mot
 
 class Command(BaseCommand):
     help = 'Refresh the list of english books.'
 
     def handle(self, *args, **options):
-        livres = BooksUrl.objects.all()
-        cpt = 0
+        livres = BooksUrl.objects.filter(bookID__gte=464,bookID__lte=1993)
         for livre in livres:
-            if cpt > 9:
-                break
             serializer = BooksUrlSerializer(livre)
             url = serializer.data['url']
             id = serializer.data['bookID']
@@ -55,8 +45,13 @@ class Command(BaseCommand):
                     lines = f.readlines()
                 for i in range (len(lines)):
                     sentence = lines[i].split()
+                    mots = []
                     for mot in sentence:
                         mot = changeCharac(mot)
+                        new_mots = mot.split()
+                        for mt in new_mots:
+                            mots.append(mt)
+                    for mot in mots:
                         isBlacklister = preg_macth(mot)
                         mot = mot.lower()
                         if not isBlacklister and mot != "" and len(mot) > 1:
@@ -83,5 +78,4 @@ class Command(BaseCommand):
                                         terme.refresh_from_db()
             except:
                 print("ERROR")
-            cpt+=1
             self.stdout.write(self.style.SUCCESS('[' + time.ctime() + '] Livre avec comme url ="%s"' % str(serializer.data['bookID'])))

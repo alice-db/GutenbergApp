@@ -128,7 +128,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-BASE_CATALOG_DIR = os.path.join(BASE_DIR, 'mygutenberg/catalog_files')
+BASE_CATALOG_DIR = os.path.join(BASE_DIR, 'mygutenberg', 'catalog_files')
 CATALOG_RDF_DIR = os.path.join(BASE_CATALOG_DIR, 'rdf')
 CATALOG_INDEX_DIR = os.path.join(CATALOG_RDF_DIR, 'index.json')
 CATALOG_LOG_DIR = os.path.join(BASE_CATALOG_DIR, 'log')
