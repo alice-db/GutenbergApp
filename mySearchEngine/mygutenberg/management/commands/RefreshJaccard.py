@@ -32,12 +32,11 @@ class FindTermBook (threading.Thread):
 class Command(BaseCommand):
 	help = 'Refresh the Jaccard matrix.'
 	content_occurences = []
-	jaccard_models = []
 
 	def handle(self, *args, **options):
 		books = BooksUrl.objects.all()
 		self.parse_occurences_file()
-		for ib1 in range(1, len(books)):
+		for ib1 in range(115, len(books)):
 			book1 = BooksUrlSerializer(books[ib1]).data
 			termes_b1 = self.find_terms_in_file(book1)
 			if len(termes_b1) > 0:
@@ -48,27 +47,16 @@ class Command(BaseCommand):
 						print("---------------------------LIVRES", book1['bookID'], book2['bookID'], "-------------------------")
 						self.jaccard_distance(book1, book2, termes_b1, termes_b2)
 
-		new_serializer = JaccardSerializer(data=self.jaccard_models, many=True)
-		self.save_model(new_serializer)
-
 	def save_new_model(self, data):
-		print(str(len(self.jaccard_models)), data)
-		if len(self.jaccard_models) >= 10000 :
-			new_serializer = JaccardSerializer(data=self.jaccard_models, many=True)
-			self.save_model(new_serializer)
-		else:
-			self.jaccard_models.append(data)
-
-	def save_model(self, serializer):
-		if serializer.is_valid():
-			try:
-				# serializer.save()
-				print("(not) save models: ", self.jaccard_models)
-				self.jaccard_models = []
-			except:
-				print("ERROR SAVE SERIALIZER")
-		else:
-			print("ERROR SERIALIZER")
+		new_serializer = JaccardSerializer(data=data)
+		if new_serializer.is_valid():
+				try:
+						new_serializer.save()
+						print("save model: ", data)
+				except:
+						print("ERROR SAVE SERIALIZER")
+		else :
+				print("ERROR SERIALIZER")
 
 	def jaccard_distance(self, book1, book2, termes_b1, termes_b2):
 		jaccard_dist_up = 0
@@ -140,7 +128,7 @@ class Command(BaseCommand):
 			# print to file
 			if book['bookID'] == 1:
 				fichier = open("occurences.txt", "a")
-				fichier.write(book_terms_occ + ";;") # 1 - [ 55; 58 [ not included 64 - tres long
+				fichier.write(book_terms_occ + ";;")
 				print("writing done")
 		except:
 			print('ERROR')
