@@ -8,19 +8,24 @@ import os
 from mygutenberg.models import BooksUrl
 from mygutenberg.serializers import BooksUrlSerializer
 from mygutenberg import util
+from mygutenberg import suggestion
 from django.conf import settings
 
 from django.http import Http404
 from django.http import JsonResponse
 
 # Create your views here.
+
+
 class RedirectionListeDesLivres(APIView):
-	def get(self, request, format=None):
-		res = []
-		for livre in BooksUrl.objects.all():
-				serializer = BooksUrlSerializer(livre)
-				res.append(serializer.data)
-		return JsonResponse(res, safe=False)
+    def get(self, request, format=None):
+        res = []
+        for livre in BooksUrl.objects.all():
+            serializer = BooksUrlSerializer(livre)
+            res.append(serializer.data)
+
+        return JsonResponse(res, safe=False)
+
 
 class LivreDetail(APIView):
     def get_object(self, pk):
