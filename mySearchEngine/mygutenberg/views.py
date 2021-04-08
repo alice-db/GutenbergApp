@@ -11,6 +11,7 @@ from mygutenberg.models import BooksUrl
 from mygutenberg.models import TermesUrl
 from mygutenberg.serializers import BooksUrlSerializer
 from mygutenberg.serializers import TermesUrlSerializer
+from mygutenberg.utils import closeness
 from mygutenberg import util
 from django.conf import settings
 
@@ -48,8 +49,10 @@ class RechercheSimple(APIView):
                 book = BooksUrl.objects.get(bookID = int(id))
                 serial = BooksUrlSerializer(book)
                 res.append(serial.data['bookID'])
-        print(len(res))
-        return JsonResponse(res, safe = False)
+        res.sort()
+        result = closeness.closenessCentrality(res)
+        
+        return JsonResponse(result, safe = False)
 
 class RechercheRegEx(APIView):
     def __init__ (self):
@@ -83,9 +86,6 @@ class RechercheRegEx(APIView):
         for index, thread in enumerate(threads):
             thread.join()
         res = self.ids
-        #for livre in BooksUrl.objects.all()[:2]:
-        #    serializer = BooksUrlSerializer(livre)
-        #    returned_research = subprocess.check_output('java -jar RegExSearch-app-1.0-jar-with-dependencies.jar "'+str(regex)+'" '+str(serializer.data['bookID']), shell=True,universal_newlines=True)
-        #    if int(returned_research) > 0:
-        #        res.append(serializer.data)
-        return JsonResponse(res, safe = False)
+        res.sort()
+        result = closeness.closenessCentrality(res)
+        return JsonResponse(result, safe = False)
