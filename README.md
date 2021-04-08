@@ -20,5 +20,17 @@ A search engine based on the Gutenberg library
 
 
 # JAR FILE
-Run with dbSqlite3
+Run with db.Sqlite3
+mvn clean install assembly:single
+
+# A FAIRE
+-> Recherche simple
+-> Continuer RegEx
+-> Classement
+-> Mettre à jour les urls de la base
+-> Mettre à jour les termes
+-> Enregistrer de nouveaux livres
+-> Enregistrer de nouveaux termes
+
+
 
