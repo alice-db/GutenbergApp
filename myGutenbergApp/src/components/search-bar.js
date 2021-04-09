@@ -1,7 +1,12 @@
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
 
-const SearchBar = () => {
+const SearchBar = ({ onChange }) => {
+	const onInputChange = (event) => {
+		let value = event.target && event.target.value;
+		onChange(value);
+	};
+
 	return (
 		<TextField
 			id="standard-full-width"
@@ -14,6 +19,7 @@ const SearchBar = () => {
 			InputLabelProps={{
 				shrink: true,
 			}}
+			onChange={onInputChange}
 		/>
 	);
 };
