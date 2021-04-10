@@ -13,7 +13,7 @@ def floydWarshall(ids, dico):
 		for j in range(len(paths)):
 			paths[i][j] = i
 
-	dist = [ [0.0] * len(ids) ] * len(ids)
+	dist = [ [float('inf')] * len(ids) ] * len(ids)
 	
 	for book1 in range (len(paths)):
 		i = ids[book1]

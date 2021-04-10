@@ -6,7 +6,7 @@ from mygutenberg.models import Jaccard
 class BooksUrlSerializer(ModelSerializer):
 	class Meta:
 		model = BooksUrl
-		fields = ('id','bookID', 'url','cover','auteurs')
+		fields = ('id','bookID', 'url','cover','auteurs','title')
 
 class TermesUrlSerializer(ModelSerializer):
 	class Meta:
