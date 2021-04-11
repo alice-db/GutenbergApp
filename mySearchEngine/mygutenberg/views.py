@@ -60,29 +60,29 @@ class RechercheSimple(APIView):
 
         resultats = []
         for id_book in res_closeness:
-            book = BooksUrl.objects.get(bookID = int(id_book))
+            book = BooksUrl.objects.get(bookID=int(id_book))
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
 
-        return JsonResponse(res_closeness, safe = False)
+        return JsonResponse(res_closeness, safe=False)
+
 
 class RechercheRegEx(APIView):
     def __init__(self):
-        self.books = []
+        self.ids = []
 
-    def printBooks(self, debut, fin,regex, dico):
+    def printBooks(self, debut, fin, regex, dico):
         new_dics = {}
-        print(debut,fin)
-        for i in range(debut,fin+1):
+        print(debut, fin)
+        for i in range(debut, fin+1):
             infos = dico[str(i)].split(";")
             id = int(infos[0])
             url = infos[1]
-            try:
-                returned_research = subprocess.check_output('java -jar RegExSearch-app-1.0-jar-with-dependencies.jar "'+str(regex)+'" "'+str(url)+'"', shell=True,universal_newlines=True)
-                if int(returned_research) > 0:
-                    self.ids.append(id)
-            except:
-                print("Une erreur inconnue pour le bookID: "+str(id))
+
+            returned_research = subprocess.check_output('java -jar RegExSearch-app-1.0-jar-with-dependencies.jar "'+str(
+                regex)+'" "'+str(url)+'"', shell=True, universal_newlines=True)
+            if int(returned_research) > 0:
+                self.ids.append(id)
 
     def get(self, request, regex, format=None):
         res = []
@@ -90,15 +90,17 @@ class RechercheRegEx(APIView):
         dict_from_csv = {}
         with open(settings.DATABASES_DIR+'/database.csv', mode='r') as inp:
             reader = csv.reader(inp)
-            dict_from_csv = {str(rows[0]):str(rows[2]+";"+rows[3]) for rows in reader}
+            dict_from_csv = {str(rows[0]): str(
+                rows[2]+";"+rows[3]) for rows in reader}
 
         threads = list()
-        for i in range (1,BooksUrl.objects.all().count()+1,50):
-            if i+49 > BooksUrl.objects.all().count() :
+        for i in range(1, BooksUrl.objects.all().count()+1, 50):
+            if i+49 > BooksUrl.objects.all().count():
                 maxi = BooksUrl.objects.all().count()
-            else :
+            else:
                 maxi = i+49
-            x = threading.Thread(target=self.printBooks, args=(i,maxi,regex,dict_from_csv,))
+            x = threading.Thread(target=self.printBooks,
+                                 args=(i, maxi, regex, dict_from_csv,))
             threads.append(x)
             x.start()
 
@@ -111,8 +113,8 @@ class RechercheRegEx(APIView):
 
         resultats = []
         for id_book in res_closeness:
-            book = BooksUrl.objects.get(bookID = int(id_book))
+            book = BooksUrl.objects.get(bookID=int(id_book))
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
 
-        return JsonResponse(resultats, safe = False)
+        return JsonResponse(resultats, safe=False)
