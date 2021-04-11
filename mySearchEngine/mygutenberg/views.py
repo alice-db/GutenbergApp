@@ -56,7 +56,6 @@ class RechercheSimple(APIView):
                     serial = BooksUrlSerializer(book)
                     res.append(serial.data['bookID'])
             res.sort()
-            print(res)
             if len(res) > 1: 
                 res_closeness = closeness.closenessCentrality(res)
             else :
@@ -78,9 +77,7 @@ class RechercheRegEx(APIView):
 
     def printBooks(self, debut, fin,regex, dico):
         new_dics = {}
-        print(debut,fin)
         for i in range(debut,fin+1):
-            print(debut,fin)
             infos = dico[str(i)].split(";")
             id = int(infos[0])
             url = infos[1]
@@ -95,31 +92,36 @@ class RechercheRegEx(APIView):
         res = []
         regex.lower()
         dict_from_csv = {}
-        with open(settings.DATABASES_DIR+'/database.csv', mode='r') as inp:
-            reader = csv.reader(inp)
-            dict_from_csv = {str(rows[0]):str(rows[2]+";"+rows[3]) for rows in reader}
-        
-        threads = list()
-        for i in range (1,BooksUrl.objects.all().count()+1,10):
-            if i+9 > BooksUrl.objects.all().count() :
-                maxi = BooksUrl.objects.all().count() 
+        try:
+            with open(settings.DATABASES_DIR+'/database.csv', mode='r') as inp:
+                reader = csv.reader(inp)
+                dict_from_csv = {str(rows[0]):str(rows[2]+";"+rows[3]) for rows in reader}
+            
+            threads = list()
+            for i in range (1,BooksUrl.objects.all().count()+1,50):
+                if i+49 > BooksUrl.objects.all().count() :
+                    maxi = BooksUrl.objects.all().count() 
+                else :
+                    maxi = i+49
+                x = threading.Thread(target=self.printBooks, args=(i,maxi,regex,dict_from_csv,))
+                threads.append(x)
+                x.start()
+
+            for index, thread in enumerate(threads):
+                thread.join()
+            
+            res = self.ids
+            res.sort()
+            if len(res) > 1: 
+                res_closeness = closeness.closenessCentrality(res)
             else :
-                maxi = i+9
-            x = threading.Thread(target=self.printBooks, args=(i,maxi,regex,dict_from_csv,))
-            threads.append(x)
-            x.start()
+                res_closeness = res
 
-        for index, thread in enumerate(threads):
-            thread.join()
-        
-        res = self.ids
-        res.sort()
-        res_closeness = closeness.closenessCentrality(res)
-
-        resultats = []
-        for id_book in res_closeness:
-            book = BooksUrl.objects.get(bookID = int(id_book))
-            serializer = BooksUrlSerializer(book).data
-            resultats.append(serializer)
-        
+            resultats = []
+            for id_book in res_closeness:
+                book = BooksUrl.objects.get(bookID = int(id_book))
+                serializer = BooksUrlSerializer(book).data
+                resultats.append(serializer)
+        except:
+            resultats = []  
         return JsonResponse(resultats, safe = False)
