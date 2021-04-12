@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import Pagination from '@material-ui/lab/Pagination';
 import BooksList from './books-list';
-import SearchBar from './search-bar';
+import SearchBookBar from './search-bar';
+import { CheckBox } from 'react-native-elements';
 
 const styles = StyleSheet.create({
 	view: {
@@ -16,10 +17,12 @@ const styles = StyleSheet.create({
 
 const BooksView = () => {
 	const [books, setBooks] = useState([]);
+	const [booksSuggestions, setBooksSuggestions] = useState([]);
 	const [foundBook, setFoundBooks] = useState([]);
 	const [booksPagination, setBooksPagination] = useState([]);
+	const [checked, setChecked] = useState(false);
 
-	const myGutenbergUrl = 'http://127.0.0.1:8000/';
+	const myGutenbergUrl = 'http://192.168.1.114:8000/';
 
 	useEffect(() => {
 		getAllBooks();
@@ -62,37 +65,28 @@ const BooksView = () => {
 	};
 
 	const onSearchChange = (value) => {
-		let searchUrl, options;
+		let searchUrl;
 
 		if (value) {
 			if (containsAny(value, ['.', '+', '*', '|', '(', ')'])) {
-				searchUrl = 'book_regex/';
-				// could be get ?
-				options = {
-					method: 'POST',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-					body: { search: value },
-				};
+				searchUrl = 'book_regex/' + value + '/';
 			} else {
 				searchUrl = 'book_simple/' + value + '/';
-				options = {
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-				};
 			}
-			fetch(myGutenbergUrl + searchUrl, options)
+			fetch(myGutenbergUrl + searchUrl, {
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+			})
 				.then((response) => {
 					return response.json();
 				})
 				.then((response) => {
-					setFoundBooks(response);
-					setBooksPagination(response.slice(0, 500));
+					setFoundBooks(response.resultats);
+					setBooksSuggestions(response.suggestions);
+					setBooksPagination(response.resultats.slice(0, 500));
 				})
 				.catch((error) => {
 					console.error(error);
@@ -105,16 +99,28 @@ const BooksView = () => {
 
 	return (
 		<>
-			<SearchBar onChange={onSearchChange} />
-			<ScrollView contentContainerStyle={styles.view}>
+			<SearchBookBar onChange={onSearchChange} />
+			<CheckBox
+				center
+				title="Toggle Suggestions"
+				checked={checked}
+				onPress={() => setChecked(!checked)}
+			/>
+			{checked && (
+				<BooksList
+					books={booksSuggestions}
+					style={{ backgroundColor: 'rgb(237, 237, 237)' }}
+				/>
+			)}
+			{!Platform.OS === 'ios' && !Platform.OS === 'android' && (
 				<Pagination
 					className={styles.pagination}
 					count={10}
 					color="secondary"
 					onChange={onPaginationChange}
 				/>
-				<BooksList books={booksPagination} />
-			</ScrollView>
+			)}
+			<BooksList books={booksPagination} />
 		</>
 	);
 };

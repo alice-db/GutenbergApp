@@ -1,18 +1,22 @@
 import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
+import { ListItem, Avatar } from 'react-native-elements';
+import { Image } from 'react-native';
+import { Text } from 'react-native';
 
-const BookView = ({ book }) => {
+const BookView = ({ book, style }) => {
 	return (
-		<ListItem>
-			<ListItemAvatar>
-				<Avatar>
-					<img src={book.cover} />
-				</Avatar>
-			</ListItemAvatar>
-			<ListItemText primary={book.url} secondary={book.auteurs} />
+		<ListItem containerStyle={style}>
+			<Avatar>
+				<Image source={book.cover} />
+			</Avatar>
+			<ListItem.Content>
+				<ListItem.Title>
+					<Text>{book.title}</Text>
+				</ListItem.Title>
+				<ListItem.Subtitle>
+					<Text>{book.auteurs}</Text>
+				</ListItem.Subtitle>
+			</ListItem.Content>
 		</ListItem>
 	);
 };

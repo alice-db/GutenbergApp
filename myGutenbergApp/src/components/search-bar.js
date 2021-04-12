@@ -1,27 +1,22 @@
-import TextField from '@material-ui/core/TextField';
-import React from 'react';
+import { StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { SearchBar } from 'react-native-elements';
 
-const SearchBar = ({ onChange }) => {
-	const onInputChange = (event) => {
-		let value = event.target && event.target.value;
+const SearchBookBar = ({ onChange }) => {
+	const [inputText, setInputText] = useState('');
+
+	const onInputChange = (value) => {
+		setInputText(value);
 		onChange(value);
 	};
 
 	return (
-		<TextField
-			id="standard-full-width"
-			// label
-			style={{ margin: 8 }}
-			placeholder="Search"
-			// helperText
-			fullWidth
-			margin="normal"
-			InputLabelProps={{
-				shrink: true,
-			}}
-			onChange={onInputChange}
+		<SearchBar
+			placeholder="Type Here..."
+			onChangeText={onInputChange}
+			value={inputText}
 		/>
 	);
 };
 
-export default SearchBar;
+export default SearchBookBar;
