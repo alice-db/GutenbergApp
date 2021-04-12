@@ -1,15 +1,14 @@
 import React from 'react';
-import List from '@material-ui/core/List';
+import { FlatList } from 'react-native';
 import BookView from './book-view';
 
-const BooksList = ({ books }) => {
+const BooksList = ({ books, style }) => {
 	return (
-		<List>
-			{!!books &&
-				books.map((book) => {
-					return <BookView book={book} />;
-				})}
-		</List>
+		<FlatList
+			data={books}
+			renderItem={({ item }) => (
+				<BookView book={item} style={style} />
+			)}></FlatList>
 	);
 };
 
