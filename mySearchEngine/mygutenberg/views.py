@@ -14,6 +14,7 @@ from mygutenberg.serializers import TermesUrlSerializer
 from mygutenberg.utils import closeness
 from mygutenberg import suggestion
 from django.conf import settings
+from mygutenberg import suggestion
 
 from django.http import Http404
 from django.http import JsonResponse
@@ -63,8 +64,8 @@ class RechercheSimple(APIView):
             book = BooksUrl.objects.get(bookID=int(id_book))
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
-
-        return JsonResponse(res_closeness, safe=False)
+        suggestions = suggestion.getSuggestions(resultats)
+        return JsonResponse({"resultats": resultats, "suggestions": suggestions}, safe=False)
 
 
 class RechercheRegEx(APIView):
@@ -78,11 +79,14 @@ class RechercheRegEx(APIView):
             infos = dico[str(i)].split(";")
             id = int(infos[0])
             url = infos[1]
+            try:
+                returned_research = subprocess.check_output('java -jar RegExSearch-app-1.0-jar-with-dependencies.jar "'+str(
+                    regex)+'" "'+str(url)+'"', shell=True, universal_newlines=True)
+                if int(returned_research) > 0:
+                    self.ids.append(id)
+            except:
+                print("Not valid regex")
 
-            returned_research = subprocess.check_output('java -jar RegExSearch-app-1.0-jar-with-dependencies.jar "'+str(
-                regex)+'" "'+str(url)+'"', shell=True, universal_newlines=True)
-            if int(returned_research) > 0:
-                self.ids.append(id)
 
     def get(self, request, regex, format=None):
         res = []
@@ -116,5 +120,5 @@ class RechercheRegEx(APIView):
             book = BooksUrl.objects.get(bookID=int(id_book))
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
-
-        return JsonResponse(resultats, safe=False)
+        suggestions = suggestion.getSuggestions(resultats)
+        return JsonResponse({resultats: resultats, suggestions: suggestions}, safe=False)
