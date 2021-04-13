@@ -1,21 +1,24 @@
-import TextField from '@material-ui/core/TextField';
-import React from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import DelayInput from 'react-native-debounce-input';
 
-const SearchBar = () => {
+const SearchBookBar = ({ onChange }) => {
+	// const [inputText, setInputText] = useState('');
+
+	const onInputChange = (value) => {
+		onChange(value);
+	};
+
 	return (
-		<TextField
-			id="standard-full-width"
-			// label
-			style={{ margin: 8 }}
-			placeholder="Search"
-			// helperText
-			fullWidth
-			margin="normal"
-			InputLabelProps={{
-				shrink: true,
-			}}
-		/>
+		<SafeAreaView>
+			<DelayInput
+				placeholder="Type Here..."
+				onChangeText={onInputChange}
+				delayTimeout={900}
+				style={{ margin: 10, height: 40, borderColor: 'gray', borderWidth: 1 }}
+			/>
+		</SafeAreaView>
 	);
 };
 
-export default SearchBar;
+export default SearchBookBar;

@@ -6,12 +6,16 @@ from django.db.models import Q
 
 
 def getSuggestions(results):
-    # keep the 2 most relevant sorted results
-    return getSuggestionsForRelevantResults(results[0:2])
+    if len(results) > 1:
+        # keep the 2 most relevant sorted results
+        return getSuggestionsForRelevantResults(results[0:2])
+    else:
+        return []
 
 
 def getSuggestionsForRelevantResults(previousBooks):
     closeBooks = []
+    res = []
     for previousBook in previousBooks:
         jaccardDistances = Jaccard.objects.filter(Q(x_bookID=previousBook['bookID']) | Q(
             y_bookID=previousBook['bookID']))
@@ -19,7 +23,8 @@ def getSuggestionsForRelevantResults(previousBooks):
             JaccardSerializer(jaccardDistances, many=True).data)
         closeBooks += getBooksFromJaccardEntries(
             closestJaccardDistances, previousBook['bookID'])
-    res = BooksUrlSerializer(closeBooks, many=True).data
+    for book in closeBooks:
+        res.append(BooksUrlSerializer(book).data)
     return res
 
 

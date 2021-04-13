@@ -26,6 +26,7 @@ SECRET_KEY = 'f%t0&fy4df2@#z@@&2g&rcu=@g27=h90=zr#hwyxz5w*3s)w9i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# add here ipv6/4 address
 ALLOWED_HOSTS = []
 
 
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-		'corsheaders',
+    'corsheaders',
     'rest_framework',
     'mygutenberg.apps.MygutenbergConfig',
 ]
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-		'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -76,7 +77,7 @@ WSGI_APPLICATION = 'mySearchEngine.wsgi.application'
 
 # Requests CORS origins
 CORS_ALLOWED_ORIGINS = [
-  "http://localhost:19006",
+    "http://localhost:19006",
 ]
 
 # Database
