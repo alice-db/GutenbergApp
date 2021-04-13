@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Platform } from 'react-native';
-import Pagination from '@material-ui/lab/Pagination';
 import BooksList from './books-list';
 import SearchBookBar from './search-bar';
 import { CheckBox } from 'react-native-elements';
-
-const styles = StyleSheet.create({
-	view: {
-		height: window.innerHeight,
-	},
-	pagination: {
-		display: 'flex',
-		justifyContent: 'center',
-	},
-});
 
 const BooksView = () => {
 	const [books, setBooks] = useState([]);
@@ -22,7 +10,7 @@ const BooksView = () => {
 	const [booksPagination, setBooksPagination] = useState([]);
 	const [checked, setChecked] = useState(false);
 
-	const myGutenbergUrl = 'http://192.168.1.114:8000/';
+	const myGutenbergUrl = 'http://[2a01:e0a:344:40a0:e889:a0bd:63dd:bd4d]:8000/'; // ipv4: 'http://192.168.1.114:8000/';
 
 	useEffect(() => {
 		getAllBooks();
@@ -43,7 +31,7 @@ const BooksView = () => {
 				console.log(response);
 				setBooks(response);
 				setFoundBooks(response);
-				setBooksPagination(response.slice(0, 500));
+				//setBooksPagination(response.slice(0, 500));
 			})
 			.catch((error) => {
 				console.error(error);
@@ -66,12 +54,12 @@ const BooksView = () => {
 
 	const onSearchChange = (value) => {
 		let searchUrl;
-
+		console.log(value);
 		if (value) {
 			if (containsAny(value, ['.', '+', '*', '|', '(', ')'])) {
 				searchUrl = 'book_regex/' + value + '/';
 			} else {
-				searchUrl = 'book_simple/' + value + '/';
+				searchUrl = 'book_simple/' + value.toLowerCase() + '/';
 			}
 			fetch(myGutenbergUrl + searchUrl, {
 				method: 'GET',
@@ -84,16 +72,17 @@ const BooksView = () => {
 					return response.json();
 				})
 				.then((response) => {
+					console.log('wtf: ' + response);
 					setFoundBooks(response.resultats);
 					setBooksSuggestions(response.suggestions);
-					setBooksPagination(response.resultats.slice(0, 500));
+					//setBooksPagination(response.resultats.slice(0, 500));
 				})
 				.catch((error) => {
 					console.error(error);
 				});
 		} else {
 			setFoundBooks(books);
-			setBooksPagination(books.slice(0, 500));
+			//setBooksPagination(books.slice(0, 500));
 		}
 	};
 
@@ -112,15 +101,7 @@ const BooksView = () => {
 					style={{ backgroundColor: 'rgb(237, 237, 237)' }}
 				/>
 			)}
-			{!Platform.OS === 'ios' && !Platform.OS === 'android' && (
-				<Pagination
-					className={styles.pagination}
-					count={10}
-					color="secondary"
-					onChange={onPaginationChange}
-				/>
-			)}
-			<BooksList books={booksPagination} />
+			<BooksList books={foundBook} />
 		</>
 	);
 };

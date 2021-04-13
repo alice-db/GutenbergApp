@@ -1,21 +1,23 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, SafeAreaView } from 'react-native';
 import React, { useState, useCallback } from 'react';
-import { SearchBar } from 'react-native-elements';
+import DelayInput from 'react-native-debounce-input';
 
 const SearchBookBar = ({ onChange }) => {
-	const [inputText, setInputText] = useState('');
+	// const [inputText, setInputText] = useState('');
 
 	const onInputChange = (value) => {
-		setInputText(value);
 		onChange(value);
 	};
 
 	return (
-		<SearchBar
-			placeholder="Type Here..."
-			onChangeText={onInputChange}
-			value={inputText}
-		/>
+		<SafeAreaView>
+			<DelayInput
+				placeholder="Type Here..."
+				onChangeText={onInputChange}
+				delayTimeout={900}
+				style={{ margin: 10, height: 40, borderColor: 'gray', borderWidth: 1 }}
+			/>
+		</SafeAreaView>
 	);
 };
 
