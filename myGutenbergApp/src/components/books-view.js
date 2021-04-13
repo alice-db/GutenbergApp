@@ -10,7 +10,8 @@ const BooksView = () => {
 	const [booksPagination, setBooksPagination] = useState([]);
 	const [checked, setChecked] = useState(false);
 
-	const myGutenbergUrl = 'http://[2a01:e0a:344:40a0:e889:a0bd:63dd:bd4d]:8000/'; // ipv4: 'http://192.168.1.114:8000/';
+	// add here ipv6/4 address of server
+	const myGutenbergUrl = '';
 
 	useEffect(() => {
 		getAllBooks();
