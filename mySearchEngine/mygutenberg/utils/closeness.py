@@ -24,10 +24,10 @@ def floydWarshall(ids, dico):
 				distance = 0.0
 			elif i < j :
 				key = str(i)+";"+str(j)
-				distance = float(dico[key])
+				distance = float(dico.get(key, 1.0))
 			else : 
 				key = str(j)+";"+str(i)
-				distance = float(dico[key])
+				distance = float(dico.get(key, 1.0))
 			new_distance.append(distance)
 		dist[book1] = new_distance
 
