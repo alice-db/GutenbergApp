@@ -6,7 +6,7 @@ import csv
 import json
 import os
 import threading
-
+import time
 from mygutenberg.models import BooksUrl
 from mygutenberg.models import TermesUrl
 from mygutenberg.serializers import BooksUrlSerializer
@@ -47,15 +47,20 @@ class LivreDetail(APIView):
 
 class RechercheSimple(APIView):
     def get(self, request, regex, format=None):
+        debut = time.time()
         res = []
+
         termes = TermesUrl.objects.filter(terme=str(regex))
         for terme in termes:
             serializer = TermesUrlSerializer(terme)
             ids = serializer.data['ids'].split(";")
             for id in ids:
-                book = BooksUrl.objects.get(bookID=int(id))
-                serial = BooksUrlSerializer(book)
-                res.append(serial.data['bookID'])
+                try:
+                    book = BooksUrl.objects.get(bookID=int(id))
+                    serial = BooksUrlSerializer(book)
+                    res.append(serial.data['bookID'])
+                except:
+                    print("book " + str(serial.data['bookID']) + " not found")
         res.sort()
         res_closeness = closeness.closenessCentrality(res)
 
@@ -65,6 +70,9 @@ class RechercheSimple(APIView):
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
         suggestions = suggestion.getSuggestions(resultats)
+        fin = time.time()
+        print("temps: " + str(fin-debut), "nb res: " +
+              str(len(resultats)))
         return JsonResponse({"resultats": resultats, "suggestions": suggestions}, safe=False)
 
 
@@ -87,6 +95,7 @@ class RechercheRegEx(APIView):
                 print("Not valid regex")
 
     def get(self, request, regex, format=None):
+        debut = time.time()
         res = []
         regex.lower()
         dict_from_csv = {}
@@ -119,4 +128,7 @@ class RechercheRegEx(APIView):
             serializer = BooksUrlSerializer(book).data
             resultats.append(serializer)
         suggestions = suggestion.getSuggestions(resultats)
-        return JsonResponse({resultats: resultats, suggestions: suggestions}, safe=False)
+        fin = time.time()
+        print("temps: " + str(fin-debut), "nb res: " +
+              str(len(resultats)))
+        return JsonResponse({"resultats": resultats, "suggestions": suggestions}, safe=False)
