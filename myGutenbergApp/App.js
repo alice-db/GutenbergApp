@@ -1,13 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import BackgroundImage from './public/smoky-background.png';
+import { StyleSheet, View } from 'react-native';
 import BooksView from './src/components/books-view';
 
 export default function App() {
 	return (
 		<View style={styles.container}>
-			<Image source={BackgroundImage} style={styles.backgroundImage} />
 			<BooksView />
 			<StatusBar style="light" />
 		</View>
